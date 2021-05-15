@@ -76,6 +76,16 @@ int Matcher::setMatcher(MATCHER matcher)
     return 1;
 }
 
+void Matcher::setBozorthThreshold(float score)
+{
+    this->thresholds.bozorthThr = score;
+}
+
+void Matcher::setSupremaThreshold(float score)
+{
+    this->thresholds.supremaThr = score;
+}
+
 int Matcher::setDBTestParams(int numberOfSubject, int imgPerSubject)
 {
     if (this->matcherIsRunning) {

@@ -18,6 +18,8 @@ public:
     BozorthMultiThreadManager bozorth3m;
 
     int setMatcher(MATCHER matcher);
+    void setBozorthThreshold(float);
+    void setSupremaThreshold(float);
     int setDBTestParams(int numberOfSubject, int imgPerSubject);
 
     void identify(unsigned char* subjectISO, const QMultiMap<QString, unsigned char *> &dbISO);
