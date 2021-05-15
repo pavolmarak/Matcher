@@ -520,8 +520,8 @@ void Matcher::bozorthMatchingDone(int duration)
 
         int bestMatch = this->findMaxScoreItem();
         if (this->fingerprintPairs[bestMatch].score >= this->thresholds.bozorthThr)
-            emit verificationDoneSignal(true);
-        else emit verificationDoneSignal(false);
+            emit verificationDoneSignal(true,this->fingerprintPairs[bestMatch].score);
+        else emit verificationDoneSignal(false,this->fingerprintPairs[bestMatch].score);
 
         this->matcherIsRunning = false;
     }
@@ -579,8 +579,8 @@ void Matcher::supremaMatchingDone()
     else if (this->mode == verification) {
         int bestMatch = std::distance(this->supremaMatcher.scores.begin(), std::max_element(this->supremaMatcher.scores.begin(), this->supremaMatcher.scores.end()));
         if (this->supremaMatcher.scores[bestMatch] >= this->thresholds.supremaThr)
-            emit verificationDoneSignal(true);
-        else emit verificationDoneSignal(false);
+            emit verificationDoneSignal(true, this->supremaMatcher.scores[bestMatch]);
+        else emit verificationDoneSignal(false, this->supremaMatcher.scores[bestMatch]);
 
         this->matcherIsRunning = false;
     }

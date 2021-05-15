@@ -76,7 +76,7 @@ private slots:
 signals:
 
     void identificationDoneSignal(bool success, QString bestSubject, float bestScore);
-    void verificationDoneSignal(bool success);
+    void verificationDoneSignal(bool success, float score);
     void dbTestDoneSignal(DBTEST_RESULT result);
 
     void matcherProgressSignal(int progress);
