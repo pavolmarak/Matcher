@@ -25,8 +25,8 @@ HEADERS += \
 #                           DEPENDENCIES
 # ********************************************************************
 
-CONFIG += manjaro
-#CONFIG += debian
+#CONFIG += manjaro
+CONFIG += debian
 
 debian {
     #Suprema SDK (installed manually)

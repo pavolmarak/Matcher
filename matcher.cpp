@@ -247,17 +247,37 @@ void Matcher::identify(const QVector<MINUTIA> &subject, const QMultiMap<QString,
         unsigned char * isoTemplate;
         unsigned char * subjectISO;
 
+        const int max_features = 150;
+        if(subject.size()>max_features){
+            this->matcherIsRunning = false;
+            emit identificationDoneSignal(
+                        false,
+                        "-1",
+                        0);
+            return;
+        }
         this->isoConverter.load(subject[0].imgWH.y(), subject[0].imgWH.x(), 100, subject);
         subjectISO = this->isoConverter.convertToISO();
 
         int cnt = 1;
         for (auto i = db.begin(); i != db.end(); ++i) {
+            if(i.value().size() > max_features){
+                continue;
+            }
             this->dbtestParams.keys.push_back(i.key());
 
             this->isoConverter.load(i.value()[0].imgWH.y(), i.value()[0].imgWH.x(), 100, i.value());
             isoTemplate = this->isoConverter.convertToISO();
 
-            UFM_VerifyEx(this->supremaMatcher.matcher, subjectISO, this->isoConverter.getTemplateSize(subjectISO), isoTemplate, this->isoConverter.getTemplateSize(isoTemplate), &score, &success);
+            UFM_VerifyEx(
+                        this->supremaMatcher.matcher,
+                        subjectISO,
+                        this->isoConverter.getTemplateSize(subjectISO),
+                        isoTemplate,
+                        this->isoConverter.getTemplateSize(isoTemplate),
+                        &score,
+                        &success);
+
             this->supremaMatcher.scores.push_back(score);
 
             emit matcherProgressSignal((int)(cnt++ * 1.0 / db.size() * 100));
@@ -348,10 +368,22 @@ void Matcher::verify(const QVector<MINUTIA> &subject, const QVector<QVector<MINU
         unsigned char * isoTemplate;
         unsigned char * subjectISO;
 
+        const int max_features = 150;
+        if(subject.size()>max_features){
+            this->matcherIsRunning = false;
+            emit verificationDoneSignal(
+                        false,
+                        0);
+            return;
+        }
+
         this->isoConverter.load(subject[0].imgWH.y(), subject[0].imgWH.x(), 100, subject);
         subjectISO = this->isoConverter.convertToISO();
 
         for (int i = 0; i < db.size(); i++) {
+            if(db[i].size() > max_features){
+                continue;
+            }
             this->isoConverter.load(db[i].at(0).imgWH.y(), db[i].at(0).imgWH.x(), 100, db[i]);
             isoTemplate = this->isoConverter.convertToISO();
 
@@ -579,21 +611,38 @@ void Matcher::bozorthMatchingDone(int duration)
 void Matcher::supremaMatchingDone()
 {
     if (this->mode == identification) {
+        this->matcherIsRunning = false;
+        if(this->supremaMatcher.scores.isEmpty()){
+            emit identificationDoneSignal(
+                        false,
+                        "-1",
+                        0);
+            return;
+        }
 
         int bestMatch = std::distance(this->supremaMatcher.scores.begin(), std::max_element(this->supremaMatcher.scores.begin(), this->supremaMatcher.scores.end()));
         if (this->supremaMatcher.scores[bestMatch] >= this->thresholds.supremaThr)
             emit identificationDoneSignal(true, this->dbtestParams.keys[bestMatch], this->supremaMatcher.scores[bestMatch]);
         else emit identificationDoneSignal(false, this->dbtestParams.keys[bestMatch], this->supremaMatcher.scores[bestMatch]);
 
-        this->matcherIsRunning = false;
+
     }
     else if (this->mode == verification) {
+
+        this->matcherIsRunning = false;
+        if(this->supremaMatcher.scores.isEmpty()){
+            emit verificationDoneSignal(
+                        false,
+                        0);
+            return;
+        }
+
         int bestMatch = std::distance(this->supremaMatcher.scores.begin(), std::max_element(this->supremaMatcher.scores.begin(), this->supremaMatcher.scores.end()));
         if (this->supremaMatcher.scores[bestMatch] >= this->thresholds.supremaThr)
             emit verificationDoneSignal(true, this->supremaMatcher.scores[bestMatch]);
         else emit verificationDoneSignal(false, this->supremaMatcher.scores[bestMatch]);
 
-        this->matcherIsRunning = false;
+
     }
     else if (this->mode == dbtest) {
 
