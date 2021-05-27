@@ -242,6 +242,7 @@ void Matcher::identify(const QVector<MINUTIA> &subject, const QMultiMap<QString,
         int success;
 
         this->supremaMatcher.scores.clear();
+        this->dbtestParams.keys.clear();
 
         unsigned char * isoTemplate;
         unsigned char * subjectISO;
